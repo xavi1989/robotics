@@ -102,7 +102,9 @@ def combine_masks(processed_folder):
 
         stacked = np.stack((im4-1, im2, im3), 2)
         argmin = np.argmin(stacked, axis=-1)
-        im = np.stack((argmin==0, argmin==1, argmin==2), 2)
+        im = np.stack((argmin==0, argmin==1, argmin==2), 2).astype(int)
+
+        #print (im[0:10, 0:10, :])
 
         base_name = os.path.basename(i)
         ind = base_name.find('cam')
@@ -127,6 +129,7 @@ def get_im_data(base_path):
             indicator_dict[f] = (False, is_val(f))
         else:
             indicator_dict[f] = (True,  is_val(f))
+
     return indicator_dict
 
 
@@ -134,7 +137,7 @@ if __name__ == '__main__':
     raw_data = os.path.join('..', 'data', 'raw_sim_data')
     proc_data = os.path.join('..', 'data', 'processed_sim_data')
 
-    indicator_dict = get_im_data(raw_data) 
+    indicator_dict = get_im_data(raw_data)
 
     out_val_dir = os.path.join(proc_data, 'validation')
     out_train_dir = os.path.join(proc_data, 'train')
