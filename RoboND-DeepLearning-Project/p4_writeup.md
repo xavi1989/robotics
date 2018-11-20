@@ -29,12 +29,19 @@ def encoder_block(input_layer, filters, strides):
 
 #### 1x1 convolution
 1 by 1 convolution means that the filter will be of size 1x1 with N depths. The stride will also be 1 on both directions. In this case, both the input and the output tensor will have the same width and height. The only difference is the depth.
+
+1x1 convolution is doing linear combinations across the channels, thus allowing complex and learnable interactions of the cross channel information.
+refer to : https://arxiv.org/pdf1312.440.pdf
+
+
 ```python
 conv2d_batchnormed = conv2d_batchnorm(encoder_2, 128, kernel_size=1, strides=1)
 ```
 
 #### Decoder
 Decoder layer will scale up the input tensor. And then concatenates the scaled input tensor with the skip tensor into combined tensor. Then do the 2d convolution on the combined tensor.
+
+skip connection helps traverse information in the network. Gradient information can be lost as we pass through many layers. Also maxpooling will make the spatial information lost too. The skip connection can help to pass feature information to lower layer which would overwise being lost. With this skip connection, the layer will have more features to work on and thus improving the accuracy.
 
 ```python
 def decoder_block(small_ip_layer, large_ip_layer, filters):
@@ -52,10 +59,11 @@ def decoder_block(small_ip_layer, large_ip_layer, filters):
 ```
 
 #### Fully convolution Network
-Fully convolution network means that every layer is convolution layer. It can consists of 1x1 convolution which in same way is equivalent to fully connected layer. The fully convolution layer does not have restrictions on the input tensor size.
+Fully convolution network means that every layer is convolution layer. The fully convolution layer does not have restrictions on the input tensor size.
 
 #### why do encoding / decoding images
-Encode layer can compress the input tensor into feature map while the decoding layer can extract the feature map and restore the original information. With this compress and de-compress method, we can remove some redundant information and focus on the real features.
+Encode layer can compress the input tensor into feature map while the decoding layer can extract the feature map and restore the original information. With this compress and de-compress method, we can remove some redundant information and focus on the real features. In the decode layer, because it used bi-linear scale up, so it will introduce noise and artifacts. in order to constrain the output tensor of decode block to be more accurate and not introduce noise, the skip connection is introduced. Skip connection will connect encoder layer with the corresponding decode layer. It will concatenate the input tensor to the encoder and the scaled up version of the input tensor to the decoder into a combined tensor.
+Then the weights of the filter can be better to re-construct the image.
 
 #### Can this model works well for other object?
 Yes this model will be working well for other objects with the proper training data.
@@ -93,8 +101,12 @@ def fcn_model(inputs, num_classes):
     return layers.Conv2D(num_classes, 1, activation='softmax', padding='same')(decoder_2)
 ```
 
-### Fully connected layer
-In the image classification task, in the last convolution layer, the input tensor will be flattened into shape of (N1, 1). Denote N2 be the shape of output tensor (N2, 1). Then the weight will be of shape (N1, N2).
+### Fully connected layer vs fully convolution layer
+In the image classification task, in the last convolution layer, the input tensor will be flattened into shape of (N1, 1). Denote N2 be the shape of output tensor (N2, 1). Then the weight will be of shape (N1, N2). As we see here, if the fully connected layer is used in the network, then the input dimension of the image is bounded to the same size of the training inputs in order to get the classification scores.
+
+Fully convolution layer does not have restrictions over the input image dimensions because there is no fully connected layer in the network.
+
+Also we can replace fully connected layer with 1x1 convolution layer at no cost. In this case, if the input image is the same size as the training inputs, we will get the classification score. If the input image is larger, then the network will automatically do sliding window on the input image. Instead of getting a single vector of classification score, we get a multidimention tensor output.
 
 ### Hyper Parameters
 #### Epoch
