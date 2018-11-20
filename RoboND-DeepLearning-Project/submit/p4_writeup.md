@@ -51,9 +51,6 @@ def decoder_block(small_ip_layer, large_ip_layer, filters):
     return output_layer
 ```
 
-#### Fully connected layer
-In the image classification task, in the last convolution layer, the input tensor will be flattened into shape of (N1, 1). Denote N2 be the shape of output tensor (N2, 1). Then the weight will be of shape (N1, N2).
-
 #### Fully convolution Network
 Fully convolution network means that every layer is convolution layer. It can consists of 1x1 convolution which in same way is equivalent to fully connected layer. The fully convolution layer does not have restrictions on the input tensor size.
 
@@ -95,6 +92,9 @@ def fcn_model(inputs, num_classes):
     # The function returns the output layer of your model. "x" is the final layer obtained from the last decoder_block()
     return layers.Conv2D(num_classes, 1, activation='softmax', padding='same')(decoder_2)
 ```
+
+### Fully connected layer
+In the image classification task, in the last convolution layer, the input tensor will be flattened into shape of (N1, 1). Denote N2 be the shape of output tensor (N2, 1). Then the weight will be of shape (N1, N2).
 
 ### Hyper Parameters
 #### Epoch
