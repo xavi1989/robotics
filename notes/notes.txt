@@ -1,0 +1,24 @@
+https://github.com/NVIDIA/nvidia-docker
+
+running docker
+https://www.tensorflow.org/install/docker#gpu_support
+
+docker run --runtime=nvidia -it --rm tensorflow/tensorflow:latest-gpu \
+   python -c "import tensorflow as tf; tf.enable_eager_execution(); print(tf.reduce_sum(tf.random_normal([1000, 1000])))"
+
+docker run --runtime=nvidia -it tensorflow/tensorflow:latest-gpu bash
+
+docker run --runtime=nvidia -v /work/tree/udacity/robotics:/robotics -it tensorflow/tensorflow:latest-gpu bash
+
+docker run command line:
+https://docs.docker.com/engine/reference/commandline/run/#options
+
+-v bind mount a volumn
+--runtime runtime to use for this container
+--rm automatically remove the container
+-it instructs Docker to allocate a pseudo-TTY connected to the container’s stdin
+
+Docker : docker run -it -p 8888:8888 image:version
+Container : jupyter notebook --ip 0.0.0.0 --no-browser --allow_root
+            jupyter notebook --ip 0.0.0.0 --no-browser --allow-root
+Host : localhost:8888/tree
